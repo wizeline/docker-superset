@@ -28,14 +28,14 @@ ENV ADMIN_PWD wizeline
 
 # by default only includes PostgreSQL because I'm selfish
 ENV DB_PACKAGES libpq-dev
-ENV DB_PIP_PACKAGES psycopg2-binary sqlalchemy-redshift
+ENV DB_PIP_PACKAGES psycopg2-binary sqlalchemy-redshift "PyAthenaJDBC>1.0.9" "PyAthena>1.2.0"
 
 RUN apt-get update \
 && apt-get install -y \
   build-essential gcc \
   libssl-dev libffi-dev libsasl2-dev libldap2-dev \
 && pip install --no-cache-dir \
-  $DB_PIP_PACKAGES gevent click==6.7 markdown==2.6.11 superset==$SUPERSET_VERSION \
+  $DB_PIP_PACKAGES "botocore<1.8.0,>=1.7.0" boto3==1.4.7 gevent click==6.7 markdown==2.6.11 superset==$SUPERSET_VERSION \
 && apt-get remove -y \
   build-essential libssl-dev libffi-dev libsasl2-dev libldap2-dev \
 && apt-get -y autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
