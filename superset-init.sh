@@ -12,13 +12,10 @@ if [ ! -f $SUPERSET_HOME/superset_config.py ]; then
   touch $SUPERSET_HOME/superset_config.py
 
   cat > $SUPERSET_HOME/superset_config.py <<EOF
-ROW_LIMIT = ${SUP_ROW_LIMIT}
-WEBSERVER_THREADS = ${SUP_WEBSERVER_THREADS}
-SUPERSET_WEBSERVER_PORT = ${SUP_WEBSERVER_PORT}
-SUPERSET_WEBSERVER_TIMEOUT = ${SUP_WEBSERVER_TIMEOUT}
 SECRET_KEY = '${SUP_SECRET_KEY}'
 SQLALCHEMY_DATABASE_URI = '${SUP_META_DB_URI}'
 CSRF_ENABLED = ${SUP_CSRF_ENABLED}
+MAPBOX_API_KEY = '${MAPBOX_API_KEY}'
 EOF
 fi
 
@@ -55,6 +52,12 @@ EOF
   echo "Creating default roles and permissions"
   superset init
 
+  echo "LOAD_EXAMPLES ${LOAD_EXAMPLES}"
+  if [ ${LOAD_EXAMPLES} == true ]; then
+    echo "Load example data"
+    superset load_examples
+  fi
+
   touch $SUPERSET_HOME/.setup-complete
 else
   # always upgrade the database, running any pending migrations
@@ -62,4 +65,5 @@ else
 fi
 
 echo "Starting up Superset"
-superset runserver -p 8088 -a 0.0.0.0 -t ${SUP_WEBSERVER_TIMEOUT}
+#superset runserver -p 8088 -a 0.0.0.0 -t ${SUP_WEBSERVER_TIMEOUT}
+gunicorn superset:app 
