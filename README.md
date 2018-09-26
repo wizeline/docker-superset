@@ -1,8 +1,6 @@
 Superset
 ===============
 
-[![](https://images.microbadger.com/badges/image/tylerfowler/superset.svg)](https://microbadger.com/images/tylerfowler/superset "Get your own image badge on microbadger.com")
-
 An extendable Docker image for Airbnb's [Superset](https://superset.apache.org/) platform.
 
 # Basic Setup
@@ -10,14 +8,14 @@ An extendable Docker image for Airbnb's [Superset](https://superset.apache.org/)
 By default the Superset meta database will be stored in a local sqlite database, in the most basic case getting a working Superset instance up and running is as simple as:
 
 ```bash
-docker run -d --name superset -p 8088:8088 tylerfowler/superset
+docker run -d --name superset-c -p 8088:8088 superset
 ```
 
 The entrypoint script will set up an admin user for you using the `ADMIN_*` environment variables, with a default username and password of:
 
 ```
 username: admin
-password: superset
+password: wizeline
 ```
 
 ## Modifying Admin Credentials
@@ -25,14 +23,14 @@ password: superset
 The admin user is created in the entrypoint script using the `ADMIN_*` environment variables in the Dockerfile, which should be overriden.
 
 ```bash
-docker run -d --name superset \
+docker run -d --name superset-c \
   -e ADMIN_USERNAME=myadminuser \
   -e ADMIN_FIRST_NAME=Some \
   -e ADMIN_LAST_NAME=Name \
   -e ADMIN_EMAIL=nobody@nowhere.com \
   -e ADMIN_PWD=mypassword \
   -p 8088:8088 \
-tylerfowler/superset
+superset
 ```
 
 ## Modifying Database Backends
@@ -44,11 +42,11 @@ In order to keep the base image as lean as possible only the Postgres driver is 
 The Superset config file is generated dynamically in the entrypoint script using the `SUP_*` environment variables, for example to increase the row limit to 10000 and the number of webserver threads to 16:
 
 ```bash
-docker run -d --name superset \
+docker run -d --name superset-c \
   -e SUP_ROW_LIMIT=10000 \
   -e SUP_WEBSERVER_THREADS=16 \
   -p 8088:8088 \
-tylerfowler/superset
+superset
 ```
 
 ## Advanced Configuration via Custom Entrypoint
@@ -72,10 +70,10 @@ EOF
 After this is finished running Superset will continue to configure itself as normal. Alternately, if the init script detects that a `superset-config.py` file already exists under `$SUPERSET_HOME` then it will skip bootstrapping the file altogether and will use the user supplied config instead. Similarly after Superset is finished setting itself up (migrating the DB, initializing, creating admin user, etc...) it will write an empty file at `$SUPERSET_HOME/.setup-complete` so that subsequent runs on a mounted volume will not set up Superset from scratch. To take advantage of this fact simply mount the `$SUPERSET_HOME` directory (which is `/superset` by default).
 
 ```bash
-docker run -d --name superset \
+docker run -d --name superset-c \
   -v /mysuperset:/superset \
   -p 8088:8088 \
-tylerfowler/superset
+superset
 ```
 
 Note, however, that even if an existing Superset configuration is detected, any user supplied `docker-entrypoint.sh` file will **still be run**. So if need be write a file that can be checked for to ensure your script only runs once in the same fashion that the `superset-init.sh` script does.
